@@ -1,0 +1,603 @@
+use File::Find;
+use Net::FTP;
+use Cwd;
+use Archive::Zip;
+use File::Copy;
+
+require "ftpmonthly.pl";
+############# Enter the path name 
+$thepath = "D\:\\apps\\WebData";
+$currdir = $thepath;
+ 
+################ Enter path to copy backups to
+$thebackup = "D\:\\apps\\WebData\\backup";
+
+
+#################################Enter the domain name
+$thedomain = "ftp.webserver.com";
+
+###########Enter usr name
+$usrname = "username";
+
+############Enter password
+$pass = "password";
+
+#########Enter directory on server to go to
+$servdir = "pdfs";
+
+$first=0;
+
+$logfile = "logit.txt";
+open(LOG,">>".$logfile);
+$now = localtime time;
+
+$upfile = $ARGV[0];
+#print $upfile;
+
+open(R,"<".$upfile);
+while($dirname = <R>)
+{
+#print $dirname;
+#print $thepath;
+copyfile($thepath,$dirname);
+}
+close(R);
+
+
+open(R,"<".$upfile);
+while($dirname = <R>)
+{
+#print $dirname;
+
+
+zipit($thepath,$dirname);
+
+ftpit($thepath,$dirname); 
+
+}
+close(R);
+
+open(R,"<".$upfile);
+
+while($dirname = <R>)
+{
+#print $dirname;
+#print $thepath;
+copyfile_zip($thepath,$dirname);
+}
+close(R);
+
+open(R2,"<".$upfile);
+while($dirname = <R2>)
+{
+erasefile_pdf($thepath,$dirname); 
+}
+
+
+sub copyfile
+{
+	#print "HERE";
+   @theargs = @_;
+     $thepath = $theargs[0];
+     $thedir = $theargs[1];
+     $thedir =~ s/\n//;
+	#print "HERE2";	
+	#print $thepath."\\".$thedir."\n";
+
+     if(-e $thepath."\\".$thedir)
+     {
+     	opendir(DIR,$thepath."\\".$thedir) || die "could not open directory";
+     
+     	while($thefile = readdir(DIR))
+     	{ 
+     		#print $thefile."\n";
+     		if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/) && 
+			($thefile =~ m/Month/ || $thefile =~ m/month/))
+				
+     		{
+     			
+     			#print "\n".$thepath."\\".$thedir."\\".$thefile;
+     		#	print "\n".$thebackup."\\".$thedir."\\".$thefile;
+     			copy($thepath."\\".$thedir."\\".$thefile, $thebackup."\\".$thedir."\\".$thefile) || die "File cannot be copied.";
+     			
+     		}
+     	}
+     	close(DIR);
+     }
+     else
+     {
+     
+     	print LOG "\n".$now.": Could not open directory ".$thepath."\\".$thedir." on local machine";
+     	
+     }
+     	
+}
+
+######sub erasefile
+######{
+######   @theargs = @_;
+######     $thepath = $theargs[0];
+######     $thedir = $theargs[1];
+######     $thedir =~ s/\n//;
+	
+######     if(-e $thepath."\\".$thedir)
+######     {
+######     	opendir(DIR,$thepath."\\".$thedir) || die ("cant open directory");
+     
+######     	while($thefile = readdir(DIR))
+######     	{ 
+######     		#print $thefile."\n";
+######     		if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/) && 
+######			($thefile =~ m/Month/ || $thefile =~ m/month/))
+######     		{
+######     			unlink($thepath."\\".$thedir."\\".$thefile) or die "File cannot be erased.";
+######     		}
+######     	}
+######     	close(DIR);
+######     }	
+######}
+
+
+
+sub zipit
+{
+	$numfiles = 0;
+   @theargs = @_;
+     $thepath = $theargs[0];
+     $thedir = $theargs[1];
+     $thedir =~ s/\n//;
+        $zip1 = Archive::Zip->new();
+        $zip2 = Archive::Zip->new();
+        $zip3 = Archive::Zip->new();
+        $zip4 = Archive::Zip->new();
+        $zip5 = Archive::Zip->new();
+        $zip6 = Archive::Zip->new();
+        $zip7 = Archive::Zip->new();
+        $zip8 = Archive::Zip->new();
+        $zip9 = Archive::Zip->new();
+        $zip10 = Archive::Zip->new();
+        $zip11 = Archive::Zip->new();
+        $zip12 = Archive::Zip->new();
+        #print $thepath."\\".$thedir."\n";
+        if(-e $thepath."\\".$thedir)
+        {
+        	opendir(THEDIR, $thepath."\\".$thedir) || die("unable to open directory");
+        	while($thefile = readdir(THEDIR))
+        	{
+      
+        	  $lastpart = getlastonly($thefile);
+        	  if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/)&& 
+			($thefile =~ m/Month/ || $thefile =~ m/month/) &&
+				($thefile =~ m/Jan/ || $thefile =~ m/jan/))
+        	  {
+        	         # print $thefile;
+        	                $numfiles++;
+        	    		$file_member = $zip1->addFile( $thepath."\/".$thedir."\/".$thefile, $thefile );
+        	              # unlink($thepath."\\".$thedir."\\".$thefile);
+        	  }
+        	  if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/)&& 
+			($thefile =~ m/Month/ || $thefile =~ m/month/) &&
+				($thefile =~ m/Feb/ || $thefile =~ m/feb/))
+        	  {
+        	         # print $thefile;
+        	                $numfiles++;
+        	    		$file_member = $zip2->addFile( $thepath."\/".$thedir."\/".$thefile, $thefile );
+        	              # unlink($thepath."\\".$thedir."\\".$thefile);
+        	  }
+        	  if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/)&& 
+			($thefile =~ m/Month/ || $thefile =~ m/month/) &&
+				($thefile =~ m/Mar/ || $thefile =~ m/mar/))
+        	  {
+        	         # print $thefile;
+        	                $numfiles++;
+        	    		$file_member = $zip3->addFile( $thepath."\/".$thedir."\/".$thefile, $thefile );
+        	              # unlink($thepath."\\".$thedir."\\".$thefile);
+        	  }
+        	  if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/)&& 
+			($thefile =~ m/Month/ || $thefile =~ m/month/) &&
+				($thefile =~ m/Apr/ || $thefile =~ m/apr/))
+        	  {
+        	         # print $thefile;
+        	                $numfiles++;
+        	    		$file_member = $zip4->addFile( $thepath."\/".$thedir."\/".$thefile, $thefile );
+        	              # unlink($thepath."\\".$thedir."\\".$thefile);
+        	  }
+        	  if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/)&& 
+			($thefile =~ m/Month/ || $thefile =~ m/month/) &&
+				($thefile =~ m/May/ || $thefile =~ m/may/))
+        	  {
+        	         # print $thefile;
+        	                $numfiles++;
+        	    		$file_member = $zip5->addFile( $thepath."\/".$thedir."\/".$thefile, $thefile );
+        	              # unlink($thepath."\\".$thedir."\\".$thefile);
+        	  }
+        	  if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/)&& 
+			($thefile =~ m/Month/ || $thefile =~ m/month/) &&
+				($thefile =~ m/Jun/ || $thefile =~ m/jun/))
+        	  {
+        	         # print $thefile;
+        	                $numfiles++;
+        	    		$file_member = $zip6->addFile( $thepath."\/".$thedir."\/".$thefile, $thefile );
+        	              # unlink($thepath."\\".$thedir."\\".$thefile);
+        	  }
+        	  if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/)&& 
+			($thefile =~ m/Month/ || $thefile =~ m/month/) &&
+				($thefile =~ m/Jul/ || $thefile =~ m/jul/))
+        	  {
+        	         # print $thefile;
+        	                $numfiles++;
+        	    		$file_member = $zip7->addFile( $thepath."\/".$thedir."\/".$thefile, $thefile );
+        	              # unlink($thepath."\\".$thedir."\\".$thefile);
+        	  }
+        	  if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/)&& 
+			($thefile =~ m/Month/ || $thefile =~ m/month/) &&
+				($thefile =~ m/Aug/ || $thefile =~ m/aug/))
+        	  {
+        	         # print $thefile;
+        	                $numfiles++;
+        	    		$file_member = $zip8->addFile( $thepath."\/".$thedir."\/".$thefile, $thefile );
+        	              # unlink($thepath."\\".$thedir."\\".$thefile);
+        	  }
+        	  if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/)&& 
+			($thefile =~ m/Month/ || $thefile =~ m/month/) &&
+				($thefile =~ m/Sep/ || $thefile =~ m/sep/))
+        	  {
+        	         # print $thefile;
+        	                $numfiles++;
+        	    		$file_member = $zip9->addFile( $thepath."\/".$thedir."\/".$thefile, $thefile );
+        	              # unlink($thepath."\\".$thedir."\\".$thefile);
+        	  }
+        	  if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/)&& 
+			($thefile =~ m/Month/ || $thefile =~ m/month/) &&
+				($thefile =~ m/Oct/ || $thefile =~ m/oct/))
+        	  {
+        	         # print $thefile;
+        	                $numfiles++;
+        	    		$file_member = $zip10->addFile( $thepath."\/".$thedir."\/".$thefile, $thefile );
+        	              # unlink($thepath."\\".$thedir."\\".$thefile);
+        	  }
+        	  if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/)&& 
+			($thefile =~ m/Month/ || $thefile =~ m/month/) &&
+				($thefile =~ m/Nov/ || $thefile =~ m/nov/))
+        	  {
+        	         # print $thefile;
+        	                $numfiles++;
+        	    		$file_member = $zip11->addFile( $thepath."\/".$thedir."\/".$thefile, $thefile );
+        	              # unlink($thepath."\\".$thedir."\\".$thefile);
+        	  }
+        	  if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/)&& 
+			($thefile =~ m/Month/ || $thefile =~ m/month/) &&
+				($thefile =~ m/Dec/ || $thefile =~ m/dec/))
+        	  {
+        	         # print $thefile;
+        	                $numfiles++;
+        	    		$file_member = $zip12->addFile( $thepath."\/".$thedir."\/".$thefile, $thefile );
+        	              # unlink($thepath."\\".$thedir."\\".$thefile);
+        	  }
+
+
+        
+        	}   
+        
+        
+        	close(THEDIR);
+        	if($numfiles > 0)
+        	{
+        	     #print "HERE";
+        		unless ( $zip1->writeToFileNamed($thepath."\/".$thedir."\/_Monthly_Jan.zip") == AZ_OK ) {
+			       die 'write error';
+   			}
+   			unless ( $zip2->writeToFileNamed($thepath."\/".$thedir."\/_Monthly_Feb.zip") == AZ_OK ) {
+						       die 'write error';
+   			}
+   			unless ( $zip3->writeToFileNamed($thepath."\/".$thedir."\/_Monthly_Mar.zip") == AZ_OK ) {
+						       die 'write error';
+   			}
+   			unless ( $zip4->writeToFileNamed($thepath."\/".$thedir."\/_Monthly_Apr.zip") == AZ_OK ) {
+						       die 'write error';
+   			}
+   			unless ( $zip5->writeToFileNamed($thepath."\/".$thedir."\/_Monthly_May.zip") == AZ_OK ) {
+						       die 'write error';
+   			}
+   			unless ( $zip6->writeToFileNamed($thepath."\/".$thedir."\/_Monthly_Jun.zip") == AZ_OK ) {
+						       die 'write error';
+   			}
+   			unless ( $zip7->writeToFileNamed($thepath."\/".$thedir."\/_Monthly_Jul.zip") == AZ_OK ) {
+						       die 'write error';
+   			}
+   			unless ( $zip8->writeToFileNamed($thepath."\/".$thedir."\/_Monthly_Aug.zip") == AZ_OK ) {
+						       die 'write error';
+   			}
+   			unless ( $zip9->writeToFileNamed($thepath."\/".$thedir."\/_Monthly_Sep.zip") == AZ_OK ) {
+						       die 'write error';
+   			}
+   			unless ( $zip10->writeToFileNamed($thepath."\/".$thedir."\/_Monthly_Oct.zip") == AZ_OK ) {
+						       die 'write error';
+   			}
+   			unless ( $zip11->writeToFileNamed($thepath."\/".$thedir."\/_Monthly_Nov.zip") == AZ_OK ) {
+						       die 'write error';
+   			}
+   			unless ( $zip12->writeToFileNamed($thepath."\/".$thedir."\/_Monthly_Dec.zip") == AZ_OK ) {
+						       die 'write error';
+   			}
+        	}
+        	
+        }
+        else
+        {
+        	
+        }
+}        
+
+
+
+
+
+
+sub ftpit
+{ 
+    @theargs = @_;
+     $thefile = $theargs[0];
+     $thedir = $theargs[1];
+     $thedir =~ s/\n//;
+	 $thedir =~ s/^\s//;
+	 $thedir =~ s/\s$//;
+     
+     
+   	
+  # if($first == 0)
+  #{
+	##get the root folder
+      
+  	#print "\n".$theroot;
+ 
+ 
+ 	##create root directory on server and go to it.
+	    $ftp = Net::FTP->new($thedomain, Debug => 0)
+	      or die "Cannot connect to some.host.name: $@";
+	      
+	    $ftp->login($usrname,$pass)
+	      or die "Cannot login ", $ftp->message;
+	      
+	         $ftp->cwd($servdir)
+	      or die "Cannot change working directory ", $ftp->message;
+	
+            $ftp->binary;
+        
+
+ 	#print "\n".getfirstparts($thefile,3);
+ 
+ 	$first = 1;
+ 	 
+ 
+	print $thedir."\n";
+	#  matt -->  print LOG "\n".$now.": ".$thedir.;
+ #}
+		$thedir2 = $thedir;
+	$thedir2 =~ s/\&/and/;
+
+      	$ftp->cwd($thedir2) or print LOG "\n".$now.": Couldn't change to ".$thedir." on host machine";
+                if ((-e $thepath."\/".$thedir."\/"."_Monthly_Jan.zip") && (-s $thepath."\/".$thedir."\/"."_Monthly_Jan.zip") > 0)
+                {
+                  $ftp->put($thepath."\/".$thedir."\/"."_Monthly_Jan.zip") or die "put failed ", $ftp->message;
+ 	         }
+                if ((-e $thepath."\/".$thedir."\/"."_Monthly_Feb.zip") && (-s $thepath."\/".$thedir."\/"."_Monthly_Feb.zip") > 0)
+                {
+                  $ftp->put($thepath."\/".$thedir."\/"."_Monthly_Feb.zip") or die "put failed ", $ftp->message;
+ 	         } 
+                if ((-e $thepath."\/".$thedir."\/"."_Monthly_Mar.zip") && (-s $thepath."\/".$thedir."\/"."_Monthly_Mar.zip") > 0)
+                {
+                  $ftp->put($thepath."\/".$thedir."\/"."_Monthly_Mar.zip") or die "put failed ", $ftp->message;
+ 	         }
+                if ((-e $thepath."\/".$thedir."\/"."_Monthly_Apr.zip") && (-s $thepath."\/".$thedir."\/"."_Monthly_Apr.zip") > 0)
+                {
+                  $ftp->put($thepath."\/".$thedir."\/"."_Monthly_Apr.zip") or die "put failed ", $ftp->message;
+ 	         }
+                if ((-e $thepath."\/".$thedir."\/"."_Monthly_May.zip") && (-s $thepath."\/".$thedir."\/"."_Monthly_May.zip") > 0)
+                {
+                  $ftp->put($thepath."\/".$thedir."\/"."_Monthly_May.zip") or die "put failed ", $ftp->message;
+ 	         }
+                if ((-e $thepath."\/".$thedir."\/"."_Monthly_Jun.zip") && (-s $thepath."\/".$thedir."\/"."_Monthly_Jun.zip") > 0)
+                {
+                  $ftp->put($thepath."\/".$thedir."\/"."_Monthly_Jun.zip") or die "put failed ", $ftp->message;
+ 	         }
+                if ((-e $thepath."\/".$thedir."\/"."_Monthly_Jul.zip") && (-s $thepath."\/".$thedir."\/"."_Monthly_Jul.zip") > 0)
+                {
+                  $ftp->put($thepath."\/".$thedir."\/"."_Monthly_Jul.zip") or die "put failed ", $ftp->message;
+ 	         }
+                if ((-e $thepath."\/".$thedir."\/"."_Monthly_Aug.zip") && (-s $thepath."\/".$thedir."\/"."_Monthly_Aug.zip") > 0)
+                {
+                  $ftp->put($thepath."\/".$thedir."\/"."_Monthly_Aug.zip") or die "put failed ", $ftp->message;
+ 	         }
+                if ((-e $thepath."\/".$thedir."\/"."_Monthly_Sep.zip") && (-s $thepath."\/".$thedir."\/"."_Monthly_Sep.zip") > 0)
+                {
+                  $ftp->put($thepath."\/".$thedir."\/"."_Monthly_Sep.zip") or die "put failed ", $ftp->message;
+ 	         }
+                if ((-e $thepath."\/".$thedir."\/"."_Monthly_Oct.zip") && (-s $thepath."\/".$thedir."\/"."_Monthly_Oct.zip") > 0)
+                {
+                  $ftp->put($thepath."\/".$thedir."\/"."_Monthly_Oct.zip") or die "put failed ", $ftp->message;
+ 	         }
+                if ((-e $thepath."\/".$thedir."\/"."_Monthly_Nov.zip") && (-s $thepath."\/".$thedir."\/"."_Monthly_Nov.zip") > 0)
+                {
+                  $ftp->put($thepath."\/".$thedir."\/"."_Monthly_Nov.zip") or die "put failed ", $ftp->message;
+ 	         }
+                if ((-e $thepath."\/".$thedir."\/"."_Monthly_Dec.zip") && (-s $thepath."\/".$thedir."\/"."_Monthly_Dec.zip") > 0 )
+                {
+                  $ftp->put($thepath."\/".$thedir."\/"."_Monthly_Dec.zip") or die "put failed ", $ftp->message;
+ 	         } 	         
+                 $ftp->cdup();
+
+$ftp->close();
+}
+
+
+
+
+
+
+ 	
+
+sub getlast
+{
+ @theargs = @_;
+ $thefile2 = $theargs[0];
+ $theroot = $theargs[1];
+ $theroot =~ s/\s//;
+ $partline = "";
+ $flag1 = 0;
+ #print "\nhere: $thefile2  $theroot\n";
+ 
+ @theparts = split('\/',$thefile2);
+ 
+ for($i=0;$i<@theparts;$i++)
+ {
+ 	if($flag1 == 1)
+  	{ 
+  	
+  		$partline = $partline."\/".$theparts[$i];
+  	}
+ 
+ 
+ 	if($flag1 == 0)
+ 	{
+ 		if($theparts[$i] =~ m/$theroot/)
+ 		{
+ 		
+ 			$partline = $theroot;
+ 			$flag1=1;
+ 		}
+ 	}
+ 	
+ }
+ 
+ return $partline;
+
+}
+sub getlastminus
+{
+ @theargs = @_;
+ $thefile3 = $theargs[0];
+ $theroot = $theargs[1];
+ $theroot =~ s/\s//;
+ $partline = "";
+ $flag1 = 0;
+ #print "\nhere: $thefile3  $theroot\n";
+ 
+ @theparts = split('\/',$thefile3);
+ 
+ for($i=0;$i<@theparts - 1;$i++)
+ {
+ 	if($flag1 == 1)
+  	{ 
+  	
+  		$partline = $partline."\/".$theparts[$i];
+  	}
+ 
+ 
+ 	if($flag1 == 0)
+ 	{
+ 		if($theparts[$i] =~ m/$theroot/)
+ 		{
+ 		
+ 			$partline = $theroot;
+ 			$flag1=1;
+ 		}
+ 	}
+ 	
+ }
+ 
+ return $partline;
+
+}
+
+sub getlastonly
+{
+ @theargs = @_;
+ $thefile3 = $theargs[0];
+ $partline = "";
+ $flag1 = 0;
+ #print "\nhere: $thefile2  $theroot\n";
+ 
+ @theparts = split('\/',$thefile3);
+ 
+ for($i=0;$i<@theparts;$i++)
+ {
+ 	$partline = $theparts[$i];
+ 	
+ }
+ 
+ return $partline;
+
+}
+sub copyfile_zip
+{
+	#print "HERE";
+   @theargs = @_;
+     $thepath = $theargs[0];
+     $thedir = $theargs[1];
+     $thedir =~ s/\n//;
+	#print "HERE2";	
+	#print $thepath."\\".$thedir."\n";
+
+     if(-e $thepath."\\".$thedir)
+     {
+     	opendir(DIR,$thepath."\\".$thedir) || die "could not open directory";
+     
+     	while($thefile = readdir(DIR))
+     	{ 
+     		#print $thefile."\n";
+			 @months = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+		($second, $minute, $hour, $dayOfMonth, $month, $yearOffset, $dayOfWeek, $dayOfYear, $daylightSavings) = localtime();
+			if($month == 1)
+			{
+				$lastmonth = "Jan";
+			}
+			else
+			{
+				$lastmonth = $months[$month - 1];
+     		}
+			if(($thefile =~ m/\.zip/ || $thefile =~ m/\.zip/) &&
+				( $thefile =~ m/$lastmonth/) &&
+				($thefile =~ m/Month/ || $thefile =~ m/month/))
+				{
+					copy($thepath."\\".$thedir."\\".$thefile, $thebackup."\\".$thedir."\\".$thefile) || die "File cannot be copied.";
+     			
+				}
+     			
+     			#print "\n".$thepath."\\".$thedir."\\".$thefile;
+     		#	print "\n".$thebackup."\\".$thedir."\\".$thefile;
+     			
+     		
+     	}
+     	close(DIR);
+     }
+     else
+     {
+     
+     	print LOG "\n".$now.": Could not open directory ".$thepath."\\".$thedir." on local machine";
+     	
+     }
+     	
+}
+sub erasefile_pdf
+{
+   @theargs = @_;
+     $thepath = $theargs[0];
+     $thedir = $theargs[1];
+     $thedir =~ s/\n//;
+	
+     if(-e $thepath."\\".$thedir)
+     {
+     	opendir(DIR,$thepath."\\".$thedir) || die ("cant open directory");
+     
+     	while($thefile = readdir(DIR))
+     	{ 
+     		#print $thefile."\n";
+     		if(($thefile =~ m/\.PDF/ || $thefile =~ m/\.pdf/) && 
+			($thefile =~ m/onth/))
+     		{
+			unlink($thepath."\\".$thedir."\\".$thefile) or die "File cannot be erased.";
+    		}
+     	}
+     	close(DIR);
+     }	}
